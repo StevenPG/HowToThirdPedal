@@ -1,10 +1,10 @@
 <template>
-  <v-card class="mx-auto" max-width="600" outlined>
+  <v-card outlined>
     <v-list-item three-line>
       <v-list-item-content>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <div class="overline mb-4" dark v-on="on">What is this?</div>
+            <div class="overline" dark v-on="on">What is this?</div>
           </template>
           <span>
             Expand the option at the bottom to enter your vehicle information.
