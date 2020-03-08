@@ -11,6 +11,7 @@
     "core-js": "^3.6.4",
     "vgauge": "^1.2.9",
     "vue": "^2.6.11",
+    "vue-gtag": "^1.6.2",
     "vuetify": "^2.2.15"
   },
   "devDependencies": {

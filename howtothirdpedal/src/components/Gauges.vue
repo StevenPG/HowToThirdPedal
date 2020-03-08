@@ -1,68 +1,155 @@
 <template>
-<v-card
-    class="mx-auto"
-    max-width="600"
-    outlined
-  >
+  <v-card class="mx-auto" max-width="600" outlined>
     <v-list-item three-line>
       <v-list-item-content>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <div class="overline mb-4" dark v-on="on">What is this?</div>
           </template>
-          <span>Expand the option at the bottom to enter your vehicle information. <br/> See what speed you'll go at what RPM in each gear!</span>
+          <span>
+            Expand the option at the bottom to enter your vehicle information.
+            <br />See what speed you'll go at what RPM in each gear!
+          </span>
         </v-tooltip>
         <v-row>
           <v-col cols="6">
-         <v-gauge :minValue="tach.min" :maxValue="tach.max" :options="tach.opts" :value="1000" />
-         <br/>
-         <p>Tachometer</p>
-         </v-col>
-         <v-col cols="6">
-         <v-gauge :minValue="speedo.min" :maxValue="speedo.max" :options="speedo.opts" :value="1000" />
-         <br/>
-         <p>Speedometer</p>
-         </v-col>
+            <v-gauge
+              :minValue="tach.min"
+              :maxValue="tach.max"
+              :options="tach.opts"
+              :value="calculations.revolutionsPerMinute"
+            />
+            <v-slider
+              v-model="calculations.revolutionsPerMinute"
+              :min="tach.min"
+              :max="tach.max"
+              thumb-label
+              v-on:click="calculateMPHUsingCurrentData"
+            ></v-slider>
+            <br />
+            <p>Tachometer</p>
+          </v-col>
+          <v-col cols="6">
+            <v-gauge
+              :minValue="speedo.min"
+              :maxValue="speedo.max"
+              :options="speedo.opts"
+              :value="calculations.milesPerHour"
+            />
+            <v-slider
+              v-model="calculations.milesPerHour"
+              :min="speedo.min"
+              :max="speedo.max"
+              thumb-label
+              v-on:click="calculateRPMUsingCurrentData"
+            ></v-slider>
+            <br />
+            <p>Speedometer</p>
+          </v-col>
         </v-row>
       </v-list-item-content>
     </v-list-item>
     <v-divider></v-divider>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn
-        color="blue"
-        text
-        @click="show = !show"
-      >
-        Enter Transmission Data
-      </v-btn>
+      <v-btn color="blue" text @click="show=!show">Enter Transmission Data</v-btn>
     </v-card-actions>
     <v-expand-transition>
       <div v-show="show">
         <v-divider></v-divider>
-        <v-card-text>
-          I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
-        </v-card-text>
+        <GaugeExpansion @updated="calculateFromExpansion" />
       </div>
     </v-expand-transition>
   </v-card>
 </template>
 
 <script>
-import VGauge from 'vgauge'
+import VGauge from "vgauge";
+import GaugeExpansion from "./gaugeexpansion/GaugeExpansion.vue";
 
 export default {
   components: {
-    VGauge
+    VGauge,
+    GaugeExpansion
   },
-  name: 'Gauges',
-  props: {
-    msg: String
+  name: "Gauges",
+  methods: {
+    /** 
+     * Calculation
+     * 
+     * [ (Axle Ratio x Vehicle Speed x Transmission Ratio x 336.13) / Tire Diameter ] for RPM
+     * [ (RPM x Tire Diameter )/( Axle Ratio x Transmission Ratio x 336.13) ] for Vehicle Speed
+    **/
+    calculateRPMUsingCurrentData(){
+      let axleRatio = this.getSelectedGearValue()
+      let sum = (this.calculations.milesPerHour * axleRatio * this.userVehicle.transmissionFinalDrive * 336.13)
+      this.calculations.revolutionsPerMinute = sum / this.userVehicle.tireDiameter
+    },
+    calculateMPHUsingCurrentData(){
+      let axleRatio = this.getSelectedGearValue()
+      let product = this.calculations.revolutionsPerMinute * this.userVehicle.tireDiameter
+      let distProduct = axleRatio * this.userVehicle.transmissionFinalDrive * 336.13
+      this.calculations.milesPerHour = product / distProduct
+    },
+    getSelectedGearValue(){
+      switch(this.userVehicle.selectedGear) {
+        case 1:
+          return this.userVehicle.firstGearRatio
+        case 2:
+          return this.userVehicle.secondGearRatio
+        case 3:
+          return this.userVehicle.thirdGearRatio
+        case 4:
+          return this.userVehicle.fourthGearRatio
+        case 5:
+          return this.userVehicle.fifthGearRatio
+        case 6:
+          return this.userVehicle.sixthGearRatio
+      }
+    },
+    // Default to calculating w/ speedo
+    calculateFromExpansion(value) {
+      if(this.validateAllFields(value)){
+        this.userVehicle = value
+        this.calculateRPMUsingCurrentData()
+      } else {
+        // Ignore!
+      }
+    },
+    validateAllFields(value){
+      if(value.tireDiameter != "" &&
+      value.selectedGear != "" &&
+      value.transmissionFinalDrive != ""){
+        return true
+      } else {
+        console.log("Invalid... Ignoring this calculation!")
+        return false
+      }
+    }
   },
   data: function() {
     return {
       // UI Data
-      show: false,
+      show: true,
+
+      // Data input by the user
+      userVehicle: {
+        tireDiameter: "",
+        selectedGear: "",
+        transmissionFinalDrive: "",
+        firstGearRatio: "",
+        secondGearRatio: "",
+        thirdGearRatio: "",
+        fourthGearRatio: "",
+        fifthGearRatio: "",
+        sixthGearRatio: ""
+      },
+
+      // Calculated Data
+      calculations: {
+        milesPerHour: 0,
+        revolutionsPerMinute: 0
+      },
 
       // Tachometer Options
       tach: {
@@ -75,22 +162,22 @@ export default {
           pointer: {
             length: 0.5, // // Relative to gauge radius
             strokeWidth: 0.033, // The thickness
-            color: '#000000' // Fill color
+            color: "#000000" // Fill color
           },
-          limitMax: false,     // If false, max value increases automatically if value > maxValue
-          limitMin: false,     // If true, the min value of the gauge will be fixed
-          colorStart: '#6FADCF',   // Colors
-          colorStop: '#8FC0DA',    // just experiment with them
-          strokeColor: '#E0E0E0',  // to see which ones work best for you
+          limitMax: true, // If false, max value increases automatically if value > maxValue
+          limitMin: true, // If true, the min value of the gauge will be fixed
+          colorStart: "#6FADCF", // Colors
+          colorStop: "#8FC0DA", // just experiment with them
+          strokeColor: "#E0E0E0", // to see which ones work best for you
           generateGradient: true,
-          highDpiSupport: true,     // High resolution support
+          highDpiSupport: true // High resolution support
         }
       },
 
       // Speedometer Options
       speedo: {
         min: 0,
-        max: 8500,
+        max: 180,
         opts: {
           angle: -0.2, // The span of the gauge arc
           lineWidth: 0.2, // The line thickness
@@ -98,20 +185,20 @@ export default {
           pointer: {
             length: 0.5, // // Relative to gauge radius
             strokeWidth: 0.033, // The thickness
-            color: '#000000' // Fill color
+            color: "#000000" // Fill color
           },
-          limitMax: false,     // If false, max value increases automatically if value > maxValue
-          limitMin: false,     // If true, the min value of the gauge will be fixed
-          colorStart: '#6FADCF',   // Colors
-          colorStop: '#8FC0DA',    // just experiment with them
-          strokeColor: '#E0E0E0',  // to see which ones work best for you
+          limitMax: true, // If false, max value increases automatically if value > maxValue
+          limitMin: true, // If true, the min value of the gauge will be fixed
+          colorStart: "#6FADCF", // Colors
+          colorStop: "#8FC0DA", // just experiment with them
+          strokeColor: "#E0E0E0", // to see which ones work best for you
           generateGradient: true,
-          highDpiSupport: true,     // High resolution support
+          highDpiSupport: true // High resolution support
         }
       }
-    }
+    };
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
