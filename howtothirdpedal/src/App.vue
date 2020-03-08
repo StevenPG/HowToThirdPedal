@@ -1,23 +1,28 @@
 <template>
   <div id="app">
     <v-app>
-      <HelloWorld msg="Welcome to Your Vue.js App"/>
-      <Gauges/>
+      <v-app-bar app color="blue" dark>
+        <v-toolbar-title>HowToThirdPedal</v-toolbar-title>
+      </v-app-bar>
+      <v-content>
+        <Gauges />
+      </v-content>
+      <v-footer app>
+        <!-- -->
+      </v-footer>
     </v-app>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import Gauges from './components/Gauges.vue'
+import Gauges from "./components/Gauges.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld,
     Gauges
   }
-}
+};
 </script>
 
 <style>
