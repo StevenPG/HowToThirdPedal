@@ -138,10 +138,8 @@ export default {
       if(this.rimDiameter != "" && this.aspectRatio != "" && this.sectionWidth != ""){
         //25.4mm to inch
         let sectionWidthInches = this.sectionWidth / 25.4
-        console.log(sectionWidthInches)
         // Cut aspect ratio down to 0.<aspectRatio>
         let sectionHeightResult = sectionWidthInches * (this.aspectRatio * 0.01)
-        console.log(sectionHeightResult)
         let rawDiameter = (sectionHeightResult * 2) + parseInt(this.rimDiameter)
         this.userVehicle.tireDiameter = rawDiameter.toFixed(1)
         this.emit()

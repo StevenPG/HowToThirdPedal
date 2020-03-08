@@ -51,6 +51,13 @@
     </v-list-item>
     <v-divider></v-divider>
     <v-card-actions>
+      <v-text-field
+          v-model="searchQuery"
+          label="Search Make and Model"
+          placeholder="Ex. 2018 Ford Mustang"
+          :append-outer-icon="'mdi-cloud-search-outline'"
+          @click:append-outer="performSearch"
+        ></v-text-field>
       <v-spacer></v-spacer>
       <v-btn color="blue" text @click="show=!show">Enter Transmission Data</v-btn>
     </v-card-actions>
@@ -74,6 +81,11 @@ export default {
   },
   name: "Gauges",
   methods: {
+    /** Google Search Proxy */
+    performSearch() {
+      let searchURL = "https://www.google.com/search?q=" + this.searchQuery + " transmission gear ratio"
+      window.open(searchURL, "_blank")
+    },
     /** 
      * Calculation
      * 
@@ -131,6 +143,7 @@ export default {
     return {
       // UI Data
       show: true,
+      searchQuery: "",
 
       // Data input by the user
       userVehicle: {
