@@ -10,6 +10,7 @@
             <v-col cols="12">
               <CommunityLinks/>
               <Gauges />
+              <VideoReferences/>
             </v-col>
           </v-row>
         </v-container>
@@ -24,12 +25,14 @@
 <script>
 import Gauges from "./components/Gauges.vue";
 import CommunityLinks from "./components/CommunityLinks.vue"
+import VideoReferences from "./components/VideoReferences.vue"
 
 export default {
   name: "App",
   components: {
     Gauges,
-    CommunityLinks
+    CommunityLinks,
+    VideoReferences
   }
 };
 </script>

@@ -15,6 +15,9 @@
         <v-btn class="ma-2" tile outlined color="#FF4500" @click="openThreePedals">
             <unicon name="reddit-alien-alt" fill="#FF4500"></unicon> reddit.com/r/threepedals
         </v-btn>
+        <v-btn class="ma-2" tile outlined color="#FF4500" @click="openThreePedals">
+            <unicon name="reddit-alien-alt" fill="#FF4500"></unicon> reddit.com/r/cars/wiki/manual
+        </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -29,6 +32,10 @@ export default {
       },
       openThreePedals: function(){
         let searchURL = "https://www.reddit.com/r/threepedals"
+        window.open(searchURL, "_blank")
+      },
+      openCars: function(){
+        let searchURL = "https://www.reddit.com/r/cars/wiki/manual"
         window.open(searchURL, "_blank")
       }
   }

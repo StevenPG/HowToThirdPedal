@@ -13,6 +13,29 @@
           v-on:click="emit"
         ></v-slider>
       </v-row>
+      <v-row justify="center">
+        <v-menu>
+          <template v-slot:activator="{ on: menu }">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on: tooltip }">
+                <v-btn color="primary" dark v-on="{ ...tooltip, ...menu }">Vehicle Presets</v-btn>
+              </template>
+              <span>This will auto-fill and overwrite the data below.</span>
+            </v-tooltip>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-list-item-title @click="overwrite18EcoMustang">2018 Ecoboost Mustang (Manual)</v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title @click="overwrite03v6Mustang">2003 v6 Mustang (Manual)</v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title @click="overwrite20CivicSi">2020 Civic Si Coupe (Manual)</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-row>
       <v-row>
         <v-col cols="12" md="4">
           <v-text-field
@@ -130,19 +153,70 @@
 <script>
 export default {
   name: "GaugeExpansion",
+  props: ["userVehicleProp"],
   methods: {
+    // Auto-fill methods
+    overwrite20CivicSi() {
+      this.userVehicle = {
+        tireDiameter: "25.4",
+        selectedGear: "1",
+        transmissionFinalDrive: "4.350",
+        firstGearRatio: "3.643",
+        secondGearRatio: "2.080",
+        thirdGearRatio: "1.361",
+        fourthGearRatio: "1.024",
+        fifthGearRatio: "0.830",
+        sixthGearRatio: "0.686"
+      };
+       this.emit()
+    },
+    overwrite03v6Mustang() {
+      this.userVehicle = {
+        tireDiameter: "25.7",
+        selectedGear: "1",
+        transmissionFinalDrive: "3.27",
+        firstGearRatio: "3.35",
+        secondGearRatio: "1.99",
+        thirdGearRatio: "1.33",
+        fourthGearRatio: "1.00",
+        fifthGearRatio: "0.68",
+        sixthGearRatio: ""
+      };
+       this.emit()
+    },
+    overwrite18EcoMustang() {
+      this.userVehicle = {
+        tireDiameter: "27.3",
+        selectedGear: "1",
+        transmissionFinalDrive: "3.31",
+        firstGearRatio: "4.236",
+        secondGearRatio: "2.538",
+        thirdGearRatio: "1.665",
+        fourthGearRatio: "1.238",
+        fifthGearRatio: "1.00",
+        sixthGearRatio: "0.834"
+      };
+      this.emit()
+    },
+
+    // Handling state
     emit() {
       this.$emit("updated", this.userVehicle);
     },
     calculateTireDiameter() {
-      if(this.rimDiameter != "" && this.aspectRatio != "" && this.sectionWidth != ""){
+      if (
+        this.rimDiameter != "" &&
+        this.aspectRatio != "" &&
+        this.sectionWidth != ""
+      ) {
         //25.4mm to inch
-        let sectionWidthInches = this.sectionWidth / 25.4
+        let sectionWidthInches = this.sectionWidth / 25.4;
         // Cut aspect ratio down to 0.<aspectRatio>
-        let sectionHeightResult = sectionWidthInches * (this.aspectRatio * 0.01)
-        let rawDiameter = (sectionHeightResult * 2) + parseInt(this.rimDiameter)
-        this.userVehicle.tireDiameter = rawDiameter.toFixed(1)
-        this.emit()
+        let sectionHeightResult =
+          sectionWidthInches * (this.aspectRatio * 0.01);
+        let rawDiameter = sectionHeightResult * 2 + parseInt(this.rimDiameter);
+        this.userVehicle.tireDiameter = rawDiameter.toFixed(1);
+        this.emit();
       } else {
         // pass
       }

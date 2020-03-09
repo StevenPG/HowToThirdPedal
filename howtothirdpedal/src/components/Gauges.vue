@@ -24,7 +24,7 @@
               :min="tach.min"
               :max="tach.max"
               thumb-label
-              v-on:click="calculateMPHUsingCurrentData"
+              v-on:change="calculateMPHUsingCurrentData"
             ></v-slider>
             <br />
             <p>Tachometer</p>
@@ -41,7 +41,7 @@
               :min="speedo.min"
               :max="speedo.max"
               thumb-label
-              v-on:click="calculateRPMUsingCurrentData"
+              v-on:change="calculateRPMUsingCurrentData"
             ></v-slider>
             <br />
             <p>Speedometer</p>
@@ -58,8 +58,8 @@
           :append-outer-icon="'mdi-cloud-search-outline'"
           @click:append-outer="performSearch"
         ></v-text-field>
-      <v-spacer></v-spacer>
-      <v-btn color="blue" text @click="show=!show">Enter Transmission Data</v-btn>
+        <v-spacer></v-spacer>
+      <v-btn color="blue" text @click="show=!show">Hide Data Entry</v-btn>
     </v-card-actions>
     <v-expand-transition>
       <div v-show="show">
